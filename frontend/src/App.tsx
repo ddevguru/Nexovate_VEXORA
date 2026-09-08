@@ -20,6 +20,7 @@ import { AnalyticsPage } from './pages/AnalyticsPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { AuditLogsPage } from './pages/AuditLogsPage';
 import { SettingsPage } from './pages/SettingsPage';
+import { AgentsConsolePage } from './pages/AgentsConsolePage';
 
 export const App: React.FC = () => {
   const { user, loading } = useAuth();
@@ -90,6 +91,10 @@ export const App: React.FC = () => {
                           onWhySuspicious={(e) => setWhySuspiciousEvent(e)}
                         />
                       }
+                    />
+                    <Route
+                      path="agents"
+                      element={<AgentsConsolePage investigationId={currentInvestigation?.id || null} />}
                     />
                     <Route
                       path="investigations"

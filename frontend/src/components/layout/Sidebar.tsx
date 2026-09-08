@@ -12,7 +12,8 @@ import {
   FileSpreadsheet,
   History,
   Settings,
-  Sparkles
+  Sparkles,
+  Bot
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -24,6 +25,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ onOpenAIModal, isMobileOpen = false, onCloseMobile }) => {
   const navItems = [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+    { label: 'AI Agent Console', path: '/agents', icon: Bot, badge: 'PRO' },
     { label: 'Investigations', path: '/investigations', icon: FolderKanban },
     { label: 'Evidence Portal', path: '/evidence', icon: FileCheck2 },
     { label: 'Timeline Engine', path: '/timeline', icon: GitCommitHorizontal, badge: 'PS16' },

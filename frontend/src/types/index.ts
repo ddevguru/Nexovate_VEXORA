@@ -165,3 +165,44 @@ export interface Report {
   file_path: string;
   generated_at: string;
 }
+
+// --- MULTI-AGENT CYBERFORENSIC SUITE ---
+export interface AgentTraceStep {
+  step_number: number;
+  thought: string;
+  action: string;
+  tool_used?: string;
+  observation: string;
+  confidence: number;
+  latency_ms: number;
+  verdict?: string;
+}
+
+export interface AgentResult {
+  agent_id: string;
+  name: string;
+  role: string;
+  avatar_icon: string;
+  status: string;
+  threat_detected: boolean;
+  threat_level: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'INFO';
+  confidence_score: number;
+  latency_ms: number;
+  logs_examined_count: number;
+  logs_analyzed_count: number;
+  findings: string[];
+  traces: AgentTraceStep[];
+  speech_text: string;
+  model_provider?: string;
+}
+
+export interface MultiAgentSuiteResponse {
+  timestamp: string;
+  total_events_analyzed: number;
+  execution_time_ms: number;
+  langfuse_trace_id: string;
+  provider_used: string;
+  tokens_processed?: number;
+  ml_confidence_score?: number;
+  agents: AgentResult[];
+}

@@ -10,7 +10,8 @@ import {
   AttackGraphData,
   AISummary,
   DashboardMetrics,
-  Report
+  Report,
+  MultiAgentSuiteResponse
 } from '../types';
 
 const api = axios.create({
@@ -180,6 +181,17 @@ export const dashboardAPI = {
 export const auditAPI = {
   list: async () => {
     const res = await api.get<Array<{ id: string; user_id?: string; action: string; resource_type?: string; resource_id?: string; timestamp: string }>>('/audit-logs');
+    return res.data;
+  }
+};
+
+export const multiAgentAPI = {
+  runAll: async (investigationId?: string): Promise<MultiAgentSuiteResponse> => {
+    if (investigationId) {
+      const res = await api.post<MultiAgentSuiteResponse>(`/ai/agents/run-all/${investigationId}`);
+      return res.data;
+    }
+    const res = await api.post<MultiAgentSuiteResponse>('/ai/agents/run-all');
     return res.data;
   }
 };
