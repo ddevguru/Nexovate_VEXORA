@@ -70,6 +70,15 @@ class AIService:
         return answer_text, ref_ids, "Deterministic Forensic Engine (Fallback)"
 
     @classmethod
+    def generate_case_summary(cls, events: List[Event], anomalies: List[Anomaly], incident: Incident = None, investigation_id: str = "") -> Dict[str, Any]:
+        from app.services.correlation_engine import CorrelationEngineService
+        attack_stages = CorrelationEngineService.extract_attack_stages(events) if events else []
+        summary = cls.generate_incident_summary(events, incident, anomalies, attack_stages)
+        if investigation_id:
+            summary["investigation_id"] = investigation_id
+        return summary
+
+    @classmethod
     def generate_incident_summary(cls, events: List[Event], incident: Incident, anomalies: List[Anomaly], attack_stages: List[Dict[str, Any]]) -> Dict[str, Any]:
         """Generates executive investigation summary with clear fact / interpretation breakdown."""
         

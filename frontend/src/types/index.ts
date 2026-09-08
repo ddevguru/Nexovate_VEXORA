@@ -133,8 +133,11 @@ export interface AISummary {
   confidence: number;
   observed_facts: string[];
   ai_interpretation: string[];
-  recommended_steps: string[];
-  provider_used: string;
+  recommended_steps?: string[];
+  provider_used?: string;
+  root_cause_analysis?: string;
+  key_findings?: string[];
+  recommended_remediations?: string[];
 }
 
 export interface DashboardMetrics {

@@ -51,7 +51,7 @@ async def get_ai_summary(
     anom_res = await db.execute(select(Anomaly).where(Anomaly.investigation_id == investigation_id))
     anomalies = anom_res.scalars().all()
 
-    summary_data = AIService.generate_case_summary(events, anomalies, incident)
+    summary_data = AIService.generate_case_summary(events, anomalies, incident, investigation_id=investigation_id)
     return AISummaryResponse(**summary_data)
 
 

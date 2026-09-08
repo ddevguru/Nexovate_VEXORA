@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { dashboardAPI } from '../services/api';
 import { DashboardMetrics, SecurityEvent } from '../types';
 import { Badge } from '../components/common/Badge';
+import { InteractiveTiltCard } from '../components/common/InteractiveTiltCard';
 import {
   ShieldAlert,
   Flame,
@@ -40,13 +41,13 @@ interface DashboardProps {
 const CustomAreaTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-slate-900 border border-slate-700/80 text-white p-3 rounded-xl shadow-xl text-xs font-sans space-y-1">
-        <p className="font-semibold text-slate-400 font-mono flex items-center gap-1.5">
-          <Clock className="w-3 h-3 text-blue-400" />
+      <div className="bg-white/95 backdrop-blur-md border border-slate-200 text-slate-800 p-3 rounded-xl shadow-xl text-xs font-sans space-y-1">
+        <p className="font-semibold text-slate-500 font-mono flex items-center gap-1.5">
+          <Clock className="w-3.5 h-3.5 text-blue-600" />
           Hour: {label}:00
         </p>
-        <p className="text-sm font-bold text-white font-mono">
-          Event Volume: <span className="text-blue-400">{payload[0].value} logs</span>
+        <p className="text-sm font-bold text-slate-900 font-mono">
+          Event Volume: <span className="text-blue-600">{payload[0].value} logs</span>
         </p>
       </div>
     );
@@ -57,7 +58,7 @@ const CustomAreaTooltip = ({ active, payload, label }: any) => {
 const CustomPieTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-slate-900 border border-slate-700/80 text-white p-2.5 rounded-xl shadow-xl text-xs font-sans">
+      <div className="bg-white/95 backdrop-blur-md border border-slate-200 text-slate-800 p-2.5 rounded-xl shadow-xl text-xs font-sans">
         <span className="font-bold font-mono" style={{ color: payload[0].payload.fill }}>
           {payload[0].name}: {payload[0].value} events
         </span>
@@ -129,60 +130,62 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Top SOC Command Header Banner */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white shadow-md relative overflow-hidden flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 border border-slate-800">
+      {/* Top SOC Command Header Banner - Crisp Light Mode */}
+      <div className="p-6 rounded-2xl bg-gradient-to-r from-white via-blue-50/50 to-indigo-50/40 border border-blue-200/70 text-slate-900 shadow-sm relative overflow-hidden flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
         <div className="relative z-10 space-y-2 max-w-2xl">
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-400 text-[11px] font-bold font-mono border border-blue-500/30 tracking-wider uppercase">
+            <span className="px-2.5 py-0.5 rounded-full bg-blue-100/80 text-blue-700 text-[11px] font-bold font-mono border border-blue-300/60 tracking-wider uppercase">
               SOC Command Overview
             </span>
-            <span className="flex items-center gap-1 text-[11px] text-emerald-400 font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            <span className="flex items-center gap-1.5 text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               Live Pipeline Active
             </span>
           </div>
 
-          <h2 className="text-2xl font-black tracking-tight text-white">{metrics.investigation_name}</h2>
-          <p className="text-xs text-slate-300">
+          <h2 className="text-2xl font-black tracking-tight text-slate-900">{metrics.investigation_name}</h2>
+          <p className="text-xs text-slate-600 font-sans">
             Automated event normalization, Isolation Forest ML anomaly detection, and graph correlation active.
           </p>
         </div>
 
         {/* Risk & Confidence Scorecards */}
-        <div className="relative z-10 flex items-center gap-4 bg-slate-900/90 p-4 rounded-xl border border-slate-700/80 backdrop-blur-md">
+        <div className="relative z-10 flex items-center gap-4 bg-white/95 p-4 rounded-xl border border-slate-200/90 shadow-sm backdrop-blur-md">
           <div className="text-center px-3">
-            <span className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase block">INCIDENT RISK</span>
-            <span className="text-3xl font-black font-mono text-red-400 drop-shadow-sm">
+            <span className="text-[10px] text-slate-500 font-semibold tracking-wider uppercase block">INCIDENT RISK</span>
+            <span className="text-3xl font-black font-mono text-red-600 drop-shadow-sm">
               {metrics.overall_risk_score}
-              <span className="text-xs text-slate-500 font-normal">/100</span>
+              <span className="text-xs text-slate-400 font-normal">/100</span>
             </span>
           </div>
-          <div className="h-10 w-px bg-slate-800" />
+          <div className="h-10 w-px bg-slate-200" />
           <div className="text-center px-3">
-            <span className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase block">ML CONFIDENCE</span>
-            <span className="text-3xl font-black font-mono text-blue-400 drop-shadow-sm">
+            <span className="text-[10px] text-slate-500 font-semibold tracking-wider uppercase block">ML CONFIDENCE</span>
+            <span className="text-3xl font-black font-mono text-blue-600 drop-shadow-sm">
               {metrics.confidence_score}%
             </span>
           </div>
         </div>
       </div>
 
-      {/* KPI Metrics Grid */}
+      {/* KPI Metrics Grid with 3D Mouse Tilt and Glare */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
         {[
-          { label: 'Total Events', val: metrics.total_events, icon: Activity, bg: 'bg-blue-50', text: 'text-blue-600', border: 'border-blue-100' },
-          { label: 'Significant', val: metrics.significant_events_count, icon: Flame, bg: 'bg-orange-50', text: 'text-orange-600', border: 'border-orange-100' },
-          { label: 'ML Anomalies', val: metrics.anomalies_count, icon: Sparkles, bg: 'bg-purple-50', text: 'text-purple-600', border: 'border-purple-100' },
-          { label: 'Critical', val: metrics.critical_findings_count, icon: AlertTriangle, bg: 'bg-red-50', text: 'text-red-600', border: 'border-red-100' },
-          { label: 'Users', val: metrics.unique_users_count, icon: Users, bg: 'bg-sky-50', text: 'text-sky-600', border: 'border-sky-100' },
-          { label: 'IP Addresses', val: metrics.unique_ips_count, icon: Globe, bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-100' },
-          { label: 'Resources', val: metrics.unique_resources_count, icon: FileCode, bg: 'bg-amber-50', text: 'text-amber-600', border: 'border-amber-100' },
+          { label: 'Total Events', val: metrics.total_events, icon: Activity, bg: 'bg-blue-50', text: 'text-blue-600', border: 'border-blue-100', glow: 'rgba(59, 130, 246, 0.15)' },
+          { label: 'Significant', val: metrics.significant_events_count, icon: Flame, bg: 'bg-orange-50', text: 'text-orange-600', border: 'border-orange-100', glow: 'rgba(249, 115, 22, 0.15)' },
+          { label: 'ML Anomalies', val: metrics.anomalies_count, icon: Sparkles, bg: 'bg-purple-50', text: 'text-purple-600', border: 'border-purple-100', glow: 'rgba(168, 85, 247, 0.15)' },
+          { label: 'Critical', val: metrics.critical_findings_count, icon: AlertTriangle, bg: 'bg-red-50', text: 'text-red-600', border: 'border-red-100', glow: 'rgba(239, 68, 68, 0.15)' },
+          { label: 'Users', val: metrics.unique_users_count, icon: Users, bg: 'bg-sky-50', text: 'text-sky-600', border: 'border-sky-100', glow: 'rgba(14, 165, 233, 0.15)' },
+          { label: 'IP Addresses', val: metrics.unique_ips_count, icon: Globe, bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-100', glow: 'rgba(16, 185, 129, 0.15)' },
+          { label: 'Resources', val: metrics.unique_resources_count, icon: FileCode, bg: 'bg-amber-50', text: 'text-amber-600', border: 'border-amber-100', glow: 'rgba(245, 158, 11, 0.15)' },
         ].map((kpi, idx) => {
           const Icon = kpi.icon;
           return (
-            <div
+            <InteractiveTiltCard
               key={idx}
-              className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 space-y-2"
+              tiltAmount={10}
+              glowColor={kpi.glow}
+              className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs hover:shadow-md transition-all duration-200 space-y-2"
             >
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold text-slate-500">{kpi.label}</span>
@@ -191,7 +194,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 </span>
               </div>
               <p className="text-2xl font-black font-mono text-slate-900 tracking-tight">{kpi.val}</p>
-            </div>
+            </InteractiveTiltCard>
           );
         })}
       </div>
