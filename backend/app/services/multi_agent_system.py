@@ -106,7 +106,15 @@ class MultiAgentSuiteService:
         start_time = time.time()
 
         # If evidence events list is empty, load high-fidelity demo attack evidence
-        active_events = events if events and len(events) > 0 else cls._load_fallback_events()
+        if not events or len(events) == 0:
+            active_events = cls._load_fallback_events()
+        elif len(events) > 3000:
+            # Filter to significant events + top sample of normal events to prevent memory/CPU bottlenecks
+            sig_events = [e for e in events if e.severity in ["HIGH", "CRITICAL", "MEDIUM"]]
+            other_events = [e for e in events if e.severity not in ["HIGH", "CRITICAL", "MEDIUM"]]
+            active_events = sig_events + other_events[:1500]
+        else:
+            active_events = events
         
         # Agent 1: Auth Sentinel Agent
         auth_agent = cls.run_auth_sentinel_agent(active_events)

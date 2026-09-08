@@ -48,28 +48,28 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenAIModal, isMobileOpen = 
       )}
 
       <aside
-        className={`fixed md:sticky top-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 h-screen transition-transform duration-300 shadow-xs ${
+        className={`fixed md:sticky top-0 left-0 z-50 w-64 bg-white/85 backdrop-blur-md border-r border-slate-200/80 flex flex-col justify-between shrink-0 h-screen transition-transform duration-300 shadow-2xs ${
           isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
         <div>
           {/* Brand Header */}
-          <div className="h-16 px-6 flex items-center justify-between border-b border-slate-200 bg-slate-50/70">
+          <div className="h-16 px-6 flex items-center justify-between border-b border-slate-200 bg-slate-900 text-white">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 shadow-xs">
-                <ShieldAlert className="w-5 h-5" />
+              <div className="p-2 rounded-xl bg-slate-800 border border-slate-700 text-slate-100 shadow-xs">
+                <ShieldAlert className="w-5 h-5 text-slate-200" />
               </div>
               <div>
-                <h1 className="font-extrabold text-slate-900 tracking-wider text-sm flex items-center gap-1.5 font-sans">
-                  CYBERTRACE <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 border border-blue-200 font-bold">PRO</span>
+                <h1 className="font-extrabold text-white tracking-wider text-sm flex items-center gap-1.5 font-sans">
+                  CYBERTRACE <span className="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-200 border border-slate-700 font-mono font-bold">PRO</span>
                 </h1>
-                <p className="text-[10px] text-slate-500 font-medium">Digital Forensics Platform</p>
+                <p className="text-[10px] text-slate-400 font-medium">Digital Forensics Engine</p>
               </div>
             </div>
           </div>
 
           {/* Navigation Items */}
-          <nav className="p-3.5 space-y-1">
+          <nav className="p-3 space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -78,23 +78,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenAIModal, isMobileOpen = 
                   to={item.path}
                   onClick={onCloseMobile}
                   className={({ isActive }) =>
-                    `group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all duration-150 ${
+                    `group flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs transition-all duration-150 relative overflow-hidden ${
                       isActive
-                        ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25 font-bold'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-semibold'
+                        ? 'bg-slate-900 text-white shadow-xs font-semibold'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-medium'
                     }`
                   }
                 >
                   {({ isActive }) => (
                     <>
-                      <div className="flex items-center gap-3">
-                        <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-blue-600'}`} />
+                      <div className="flex items-center gap-3 relative z-10">
+                        <Icon className={`w-4 h-4 transition-transform duration-200 group-hover:scale-110 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-900'}`} />
                         <span className="tracking-wide">{item.label}</span>
                       </div>
                       {item.badge && (
-                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold ${
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold relative z-10 transition-transform group-hover:scale-105 ${
                           isActive
-                            ? 'bg-blue-700 text-white border border-blue-400/40'
+                            ? 'bg-slate-800 text-slate-200 border border-slate-700'
                             : 'bg-slate-100 text-slate-600 border border-slate-200'
                         }`}>
                           {item.badge}
@@ -109,9 +109,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenAIModal, isMobileOpen = 
         </div>
 
         {/* AI Assistant Callout */}
-        <div className="p-4 m-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5 shadow-xs">
+        <div className="p-4 m-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5 shadow-2xs">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-blue-600" />
+            <Sparkles className="w-4 h-4 text-slate-700" />
             <span className="text-xs font-bold text-slate-900">AI Forensic Assistant</span>
           </div>
           <p className="text-[11px] text-slate-500 leading-tight">Evidence-grounded Q&A strictly from PostgreSQL log records.</p>
@@ -120,18 +120,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenAIModal, isMobileOpen = 
               if (onCloseMobile) onCloseMobile();
               onOpenAIModal();
             }}
-            className="w-full py-2 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-all flex items-center justify-center gap-1.5"
+            className="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold py-2 px-3 rounded-lg shadow-xs transition-all flex items-center justify-center gap-2"
           >
             <Sparkles className="w-3.5 h-3.5" />
             Launch Assistant
           </button>
-          
+        </div>
           <div className="pt-2 text-center border-t border-slate-200">
             <NavLink to="/" className="text-[11px] text-slate-500 hover:text-blue-600 transition-colors font-sans">
               ← Public Landing Page
             </NavLink>
           </div>
-        </div>
       </aside>
     </>
   );

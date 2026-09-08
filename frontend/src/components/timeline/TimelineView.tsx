@@ -49,7 +49,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
 
   const fetchTimeline = async () => {
     if (!investigationId) return;
-    setLoading(true);
+    if (!data) setLoading(true);
     try {
       const res = await timelineAPI.getTimeline(investigationId, {
         page,

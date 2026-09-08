@@ -15,7 +15,13 @@ async def list_incidents(id: str, db: AsyncSession = Depends(get_async_db), curr
     inc_res = await db.execute(select(Incident).where(Incident.investigation_id == id))
     incidents = inc_res.scalars().all()
 
-    ev_res = await db.execute(select(Event).where(Event.investigation_id == id))
+    # Query significant events for attack stage extraction
+    ev_res = await db.execute(
+        select(Event)
+        .where(Event.investigation_id == id)
+        .order_by(Event.risk_score.desc())
+        .limit(1000)
+    )
     events = ev_res.scalars().all()
 
     res = []
@@ -31,7 +37,12 @@ async def get_attack_graph(id: str, db: AsyncSession = Depends(get_async_db), cu
     incident = inc_res.scalars().first()
 
     if not incident:
-        ev_res = await db.execute(select(Event).where(Event.investigation_id == id))
+        ev_res = await db.execute(
+            select(Event)
+            .where(Event.investigation_id == id)
+            .order_by(Event.risk_score.desc())
+            .limit(1000)
+        )
         events = ev_res.scalars().all()
         incident, nodes, edges = CorrelationEngineService.process_correlation(events, [], id)
     else:
@@ -54,14 +65,24 @@ async def get_attack_graph(id: str, db: AsyncSession = Depends(get_async_db), cu
 @router.get("/{id}/replay", response_model=List[EventOut])
 async def get_incident_replay_stream(id: str, db: AsyncSession = Depends(get_async_db), current_user: User = Depends(get_current_user)):
     """Returns chronological event stream for step-by-step incident replay animation."""
-    ev_res = await db.execute(select(Event).where(Event.investigation_id == id).order_by(Event.timestamp.asc()))
+    ev_res = await db.execute(
+        select(Event)
+        .where(Event.investigation_id == id)
+        .order_by(Event.timestamp.asc())
+        .limit(500)
+    )
     events = ev_res.scalars().all()
     return [EventOut.from_orm(e) for e in events]
 
 @router.get("/{id}/impact")
 async def get_impact_analysis(id: str, db: AsyncSession = Depends(get_async_db), current_user: User = Depends(get_current_user)):
     """Calculates actual affected users, systems, databases, files, and exfiltrated volume directly from PostgreSQL."""
-    ev_res = await db.execute(select(Event).where(Event.investigation_id == id))
+    ev_res = await db.execute(
+        select(Event)
+        .where(Event.investigation_id == id)
+        .order_by(Event.risk_score.desc())
+        .limit(2000)
+    )
     events = ev_res.scalars().all()
 
     affected_users = list(set([e.user for e in events if e.user and e.user not in ["UNKNOWN", "N/A"]]))

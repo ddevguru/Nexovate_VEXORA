@@ -7,42 +7,44 @@ class EventNormalizerService:
     @staticmethod
     def normalize_record(raw_record: Dict[str, Any], investigation_id: str, evidence_file_id: str = None) -> Dict[str, Any]:
         """Maps an un-normalized dictionary entry into standardized Event attributes."""
+        # Build lower-case record map once for O(1) attribute lookups
+        lower_rec = {str(k).lower(): v for k, v in raw_record.items() if v is not None}
         
         # Extract Timestamp
-        timestamp = EventNormalizerService._extract_timestamp(raw_record)
+        timestamp = EventNormalizerService._extract_timestamp(lower_rec)
         
         # Extract User
-        user = EventNormalizerService._find_first(raw_record, ["user", "username", "account", "src_user", "uid", "subject_user_name"])
+        user = EventNormalizerService._find_first(lower_rec, ["user", "username", "account", "src_user", "uid", "subject_user_name"])
         if user and user in ["-", "N/A", "null", "none"]:
             user = None
 
         # Extract Source IP
-        source_ip = EventNormalizerService._find_first(raw_record, ["source_ip", "src_ip", "ip", "client_ip", "src", "source_address", "c_ip"])
+        source_ip = EventNormalizerService._find_first(lower_rec, ["source_ip", "src_ip", "ip", "client_ip", "src", "source_address", "c_ip"])
         if source_ip and not re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', source_ip):
             if source_ip == "::1":
                 source_ip = "127.0.0.1"
 
         # Extract Destination IP
-        dest_ip = EventNormalizerService._find_first(raw_record, ["destination_ip", "dest_ip", "dst_ip", "target_ip", "dst", "server_ip"])
+        dest_ip = EventNormalizerService._find_first(lower_rec, ["destination_ip", "dest_ip", "dst_ip", "target_ip", "dst", "server_ip"])
 
         # Extract Action & Message
-        raw_msg = raw_record.get("raw") or raw_record.get("message") or raw_record.get("event") or str(raw_record)
-        action_val = EventNormalizerService._find_first(raw_record, ["action", "event_type", "activity", "method", "command", "operation"])
+        raw_msg = lower_rec.get("raw") or lower_rec.get("message") or lower_rec.get("event") or str(raw_record)
+        action_val = EventNormalizerService._find_first(lower_rec, ["action", "event_type", "activity", "method", "command", "operation"])
         if not action_val:
-            action_val = EventNormalizerService._infer_action_from_message(raw_msg)
+            action_val = EventNormalizerService._infer_action_from_message(str(raw_msg))
 
         # Extract Resource & Hostname
-        resource = EventNormalizerService._find_first(raw_record, ["resource", "file", "path", "url", "target", "database", "table", "object_name"])
-        hostname = EventNormalizerService._find_first(raw_record, ["hostname", "host", "computer_name", "server"])
+        resource = EventNormalizerService._find_first(lower_rec, ["resource", "file", "path", "url", "target", "database", "table", "object_name"])
+        hostname = EventNormalizerService._find_first(lower_rec, ["hostname", "host", "computer_name", "server"])
 
         # Extract Status
-        status_val = EventNormalizerService._normalize_status(raw_record, raw_msg)
+        status_val = EventNormalizerService._normalize_status(lower_rec, str(raw_msg))
 
         # Determine Event Category / Event Type
-        event_category, base_severity = EventNormalizerService._categorize_event(action_val, raw_msg, status_val)
+        event_category, base_severity = EventNormalizerService._categorize_event(action_val, str(raw_msg), status_val)
 
         # Normalize Severity if specified explicitly or fallback to base
-        explicit_sev = EventNormalizerService._find_first(raw_record, ["severity", "level", "log_level"])
+        explicit_sev = EventNormalizerService._find_first(lower_rec, ["severity", "level", "log_level"])
         final_severity = EventNormalizerService._normalize_severity(explicit_sev, base_severity)
 
         return {
@@ -60,19 +62,16 @@ class EventNormalizerService:
             "status": status_val,
             "severity": final_severity,
             "risk_score": 0, # computed later by RiskEngine
-            "raw_log": raw_msg[:2000],
+            "raw_log": str(raw_msg)[:2000],
             "normalized_data": raw_record
         }
 
     @staticmethod
-    def _find_first(d: Dict[str, Any], keys: list) -> str:
+    def _find_first(lower_dict: Dict[str, Any], keys: list) -> str:
         for k in keys:
-            if k in d and d[k] is not None and str(d[k]).strip():
-                return str(d[k]).strip()
-            # Check case-insensitive
-            for actual_key in d.keys():
-                if actual_key.lower() == k.lower() and d[actual_key] is not None:
-                    return str(d[actual_key]).strip()
+            val = lower_dict.get(k.lower())
+            if val is not None and str(val).strip():
+                return str(val).strip()
         return None
 
     @staticmethod

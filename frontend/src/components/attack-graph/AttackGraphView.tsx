@@ -246,7 +246,7 @@ export const AttackGraphView: React.FC<AttackGraphViewProps> = ({ investigationI
   }, [investigationId]);
 
   const loadGraph = async () => {
-    setLoading(true);
+    if (!graphData) setLoading(true);
     try {
       let data: AttackGraphData;
       if (investigationId) {

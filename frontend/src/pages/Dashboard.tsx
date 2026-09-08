@@ -84,7 +84,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   const loadMetrics = async () => {
     if (!investigationId) return;
-    setLoading(true);
+    if (!metrics) setLoading(true);
     try {
       const data = await dashboardAPI.getMetrics(investigationId);
       setMetrics(data);
@@ -130,14 +130,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Top SOC Command Header Banner - Crisp Light Mode */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-white via-blue-50/50 to-indigo-50/40 border border-blue-200/70 text-slate-900 shadow-sm relative overflow-hidden flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+      {/* Top SOC Command Header Banner - Glassmorphism */}
+      <div className="p-6 rounded-2xl bg-white/80 backdrop-blur-md border border-slate-200/80 text-slate-900 shadow-2xs relative overflow-hidden flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
         <div className="relative z-10 space-y-2 max-w-2xl">
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full bg-blue-100/80 text-blue-700 text-[11px] font-bold font-mono border border-blue-300/60 tracking-wider uppercase">
+            <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-800 text-[10px] font-bold font-mono border border-slate-200 tracking-wider uppercase">
               SOC Command Overview
             </span>
-            <span className="flex items-center gap-1.5 text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+            <span className="flex items-center gap-1.5 text-[11px] text-emerald-800 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               Live Pipeline Active
             </span>
@@ -150,18 +150,18 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Risk & Confidence Scorecards */}
-        <div className="relative z-10 flex items-center gap-4 bg-white/95 p-4 rounded-xl border border-slate-200/90 shadow-sm backdrop-blur-md">
+        <div className="relative z-10 flex items-center gap-4 bg-white/90 p-4 rounded-xl border border-slate-200/80 shadow-2xs backdrop-blur-md">
           <div className="text-center px-3">
-            <span className="text-[10px] text-slate-500 font-semibold tracking-wider uppercase block">INCIDENT RISK</span>
-            <span className="text-3xl font-black font-mono text-red-600 drop-shadow-sm">
+            <span className="text-[10px] text-slate-500 font-bold font-mono tracking-wider uppercase block">INCIDENT RISK</span>
+            <span className="text-3xl font-black font-mono text-rose-700 drop-shadow-2xs">
               {metrics.overall_risk_score}
               <span className="text-xs text-slate-400 font-normal">/100</span>
             </span>
           </div>
           <div className="h-10 w-px bg-slate-200" />
           <div className="text-center px-3">
-            <span className="text-[10px] text-slate-500 font-semibold tracking-wider uppercase block">ML CONFIDENCE</span>
-            <span className="text-3xl font-black font-mono text-blue-600 drop-shadow-sm">
+            <span className="text-[10px] text-slate-500 font-bold font-mono tracking-wider uppercase block">ML CONFIDENCE</span>
+            <span className="text-3xl font-black font-mono text-slate-900 drop-shadow-2xs">
               {metrics.confidence_score}%
             </span>
           </div>
@@ -202,15 +202,15 @@ export const Dashboard: React.FC<DashboardProps> = ({
       {/* Main Charts Row */}
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Events & Risk Over Time */}
-        <div className="lg:col-span-2 p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 space-y-4">
+        <div className="lg:col-span-2 p-6 rounded-2xl bg-white/80 backdrop-blur-md border border-slate-200/80 shadow-2xs hover:shadow-md transition-all duration-200 space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
               <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-blue-600" /> Event Frequency & Risk Trend
+                <TrendingUp className="w-4 h-4 text-slate-700" /> Event Frequency & Risk Trend
               </h3>
               <p className="text-xs text-slate-500">Hourly timeline breakdown of log ingestion</p>
             </div>
-            <span className="text-[11px] font-semibold font-mono text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-100">
+            <span className="text-[10px] font-bold font-mono text-slate-800 bg-slate-100 px-2.5 py-1 rounded-md border border-slate-200">
               Hourly Log Stream
             </span>
           </div>
@@ -220,22 +220,22 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <AreaChart data={metrics.events_over_time} margin={{ top: 15, right: 15, left: -15, bottom: 5 }}>
                 <defs>
                   <linearGradient id="colorEv" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#2563eb" stopOpacity={0.35} />
-                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#0f172a" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="#0f172a" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="4 4" stroke="#e2e8f0" vertical={false} />
                 <XAxis dataKey="hour" stroke="#334155" fontSize={12} fontWeight={700} tickLine={false} axisLine={{ stroke: '#cbd5e1', strokeWidth: 1.5 }} />
                 <YAxis stroke="#334155" fontSize={12} fontWeight={700} tickLine={false} axisLine={{ stroke: '#cbd5e1', strokeWidth: 1.5 }} />
                 <Tooltip content={<CustomAreaTooltip />} />
-                <Area type="monotone" dataKey="events" stroke="#2563eb" strokeWidth={3} fillOpacity={1} fill="url(#colorEv)" />
+                <Area type="monotone" dataKey="events" stroke="#0f172a" strokeWidth={3} fillOpacity={1} fill="url(#colorEv)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Severity Distribution Pie Chart */}
-        <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md transition-all duration-200 space-y-4 flex flex-col justify-between">
+        <div className="p-6 rounded-2xl bg-white/80 backdrop-blur-md border border-slate-200/80 shadow-2xs hover:shadow-md transition-all duration-200 space-y-4 flex flex-col justify-between">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
               <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">

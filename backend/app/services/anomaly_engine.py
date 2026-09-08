@@ -49,9 +49,10 @@ class AnomalyEngineService:
         feature_cols = ["hour", "day_of_week", "is_auth_fail", "is_priv_esc", "is_data_transfer", "user_freq", "ip_freq", "risk_score"]
         X = df[feature_cols].values
 
-        # Train Isolation Forest
+        # Train Isolation Forest with multi-threading and capped sample sizes for fast processing
         try:
-            model = IsolationForest(n_estimators=100, contamination=0.15, random_state=42)
+            sample_cap = min(256, len(X))
+            model = IsolationForest(n_estimators=100, max_samples=sample_cap, contamination=0.15, random_state=42, n_jobs=-1)
             model.fit(X)
             
             # Decision function returns lower score for anomalies

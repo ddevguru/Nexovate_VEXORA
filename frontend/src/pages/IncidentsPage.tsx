@@ -62,7 +62,7 @@ export const IncidentsPage: React.FC<IncidentsPageProps> = ({ investigationId })
 
   const loadData = async () => {
     if (!investigationId) return;
-    setLoading(true);
+    if (!impact && incidents.length === 0) setLoading(true);
     try {
       const incList = await incidentsAPI.list(investigationId).catch(() => []);
       setIncidents(incList || []);

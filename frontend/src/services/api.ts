@@ -26,6 +26,50 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// High-performance client-side response cache (SWR / Stale-While-Revalidate)
+const responseCache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_TTL_MS = 180 * 1000; // 3 minutes cache
+
+export const clearAPICache = (prefix?: string) => {
+  if (!prefix) {
+    responseCache.clear();
+    return;
+  }
+  for (const key of responseCache.keys()) {
+    if (key.includes(prefix)) {
+      responseCache.delete(key);
+    }
+  }
+};
+
+const cachedGet = async <T>(url: string, params?: Record<string, any>): Promise<T> => {
+  const cacheKey = `${url}?${JSON.stringify(params || {})}`;
+  const cached = responseCache.get(cacheKey);
+  const now = Date.now();
+
+  if (cached && (now - cached.timestamp < CACHE_TTL_MS)) {
+    return cached.data as T;
+  }
+
+  const res = await api.get<T>(url, { params });
+  responseCache.set(cacheKey, { data: res.data, timestamp: now });
+  return res.data;
+};
+
+const cachedPost = async <T>(url: string, data?: any): Promise<T> => {
+  const cacheKey = `POST:${url}?${JSON.stringify(data || {})}`;
+  const cached = responseCache.get(cacheKey);
+  const now = Date.now();
+
+  if (cached && (now - cached.timestamp < CACHE_TTL_MS)) {
+    return cached.data as T;
+  }
+
+  const res = await api.post<T>(url, data);
+  responseCache.set(cacheKey, { data: res.data, timestamp: now });
+  return res.data;
+};
+
 export const authAPI = {
   login: async (email: string, password: string) => {
     const formData = new URLSearchParams();
@@ -41,26 +85,25 @@ export const authAPI = {
     return res.data;
   },
   getMe: async () => {
-    const res = await api.get<User>('/auth/me');
-    return res.data;
+    return cachedGet<User>('/auth/me');
   }
 };
 
 export const investigationsAPI = {
   list: async () => {
-    const res = await api.get<Investigation[]>('/investigations');
-    return res.data;
+    return cachedGet<Investigation[]>('/investigations');
   },
   create: async (name: string, description?: string, severity = 'MEDIUM') => {
     const res = await api.post<Investigation>('/investigations', { name, description, severity });
+    clearAPICache('/investigations');
     return res.data;
   },
   get: async (id: string) => {
-    const res = await api.get<Investigation>(`/investigations/${id}`);
-    return res.data;
+    return cachedGet<Investigation>(`/investigations/${id}`);
   },
   delete: async (id: string) => {
     await api.delete(`/investigations/${id}`);
+    clearAPICache('/investigations');
   }
 };
 
@@ -71,61 +114,58 @@ export const evidenceAPI = {
     const res = await api.post<EvidenceFile>(`/investigations/${investigationId}/evidence`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
+    clearAPICache(investigationId);
     return res.data;
   },
   list: async (investigationId: string) => {
-    const res = await api.get<EvidenceFile[]>(`/investigations/${investigationId}/evidence`);
-    return res.data;
+    return cachedGet<EvidenceFile[]>(`/investigations/${investigationId}/evidence`);
   },
   delete: async (fileId: string) => {
     await api.delete(`/evidence/${fileId}`);
+    clearAPICache();
   }
 };
 
 export const timelineAPI = {
   analyze: async (investigationId: string) => {
     const res = await api.post(`/investigations/${investigationId}/analyze`);
+    clearAPICache(investigationId);
     return res.data;
   },
   getTimeline: async (investigationId: string, params: Record<string, any>) => {
-    const res = await api.get<TimelineResponse>(`/investigations/${investigationId}/timeline`, { params });
-    return res.data;
+    return cachedGet<TimelineResponse>(`/investigations/${investigationId}/timeline`, params);
   }
 };
 
 export const eventsAPI = {
   getDetail: async (eventId: string) => {
-    const res = await api.get<SecurityEvent>(`/events/${eventId}`);
-    return res.data;
+    return cachedGet<SecurityEvent>(`/events/${eventId}`);
   },
   ingest: async (investigationId: string, events: any[]) => {
     const res = await api.post(`/investigations/${investigationId}/events/ingest`, { events });
+    clearAPICache(investigationId);
     return res.data;
   }
 };
 
 export const anomaliesAPI = {
   list: async (investigationId: string) => {
-    const res = await api.get<Anomaly[]>(`/investigations/${investigationId}/anomalies`);
-    return res.data;
+    return cachedGet<Anomaly[]>(`/investigations/${investigationId}/anomalies`);
   }
 };
 
 export const incidentsAPI = {
   list: async (investigationId: string) => {
-    const res = await api.get<Incident[]>(`/investigations/${investigationId}/incidents`);
-    return res.data;
+    return cachedGet<Incident[]>(`/investigations/${investigationId}/incidents`);
   },
   getAttackGraph: async (investigationId: string) => {
-    const res = await api.get<AttackGraphData>(`/investigations/${investigationId}/attack-graph`);
-    return res.data;
+    return cachedGet<AttackGraphData>(`/investigations/${investigationId}/attack-graph`);
   },
   getReplayStream: async (investigationId: string) => {
-    const res = await api.get<SecurityEvent[]>(`/investigations/${investigationId}/replay`);
-    return res.data;
+    return cachedGet<SecurityEvent[]>(`/investigations/${investigationId}/replay`);
   },
   getImpactAnalysis: async (investigationId: string) => {
-    const res = await api.get<{
+    return cachedGet<{
       investigation_id: string;
       overall_risk_score: number;
       high_risk_events_count: number;
@@ -135,7 +175,6 @@ export const incidentsAPI = {
       affected_files: string[];
       estimated_impact_level: string;
     }>(`/investigations/${investigationId}/impact`);
-    return res.data;
   }
 };
 
@@ -148,19 +187,18 @@ export const aiAPI = {
     return res.data;
   },
   getSummary: async (investigationId: string) => {
-    const res = await api.post<AISummary>(`/ai/summary/${investigationId}`);
-    return res.data;
+    return cachedPost<AISummary>(`/ai/summary/${investigationId}`);
   }
 };
 
 export const reportsAPI = {
   generate: async (investigationId: string) => {
     const res = await api.post<Report>(`/investigations/${investigationId}/reports`);
+    clearAPICache(investigationId);
     return res.data;
   },
   list: async (investigationId: string) => {
-    const res = await api.get<Report[]>(`/investigations/${investigationId}/reports`);
-    return res.data;
+    return cachedGet<Report[]>(`/investigations/${investigationId}/reports`);
   },
   downloadBlob: async (reportId: string) => {
     const res = await api.get(`/reports/${reportId}/download`, {
@@ -173,26 +211,22 @@ export const reportsAPI = {
 
 export const dashboardAPI = {
   getMetrics: async (investigationId: string) => {
-    const res = await api.get<DashboardMetrics>(`/investigations/${investigationId}/dashboard`);
-    return res.data;
+    return cachedGet<DashboardMetrics>(`/investigations/${investigationId}/dashboard`);
   }
 };
 
 export const auditAPI = {
   list: async () => {
-    const res = await api.get<Array<{ id: string; user_id?: string; action: string; resource_type?: string; resource_id?: string; timestamp: string }>>('/audit-logs');
-    return res.data;
+    return cachedGet<Array<{ id: string; user_id?: string; action: string; resource_type?: string; resource_id?: string; timestamp: string }>>('/audit-logs');
   }
 };
 
 export const multiAgentAPI = {
   runAll: async (investigationId?: string): Promise<MultiAgentSuiteResponse> => {
     if (investigationId) {
-      const res = await api.post<MultiAgentSuiteResponse>(`/ai/agents/run-all/${investigationId}`);
-      return res.data;
+      return cachedPost<MultiAgentSuiteResponse>(`/ai/agents/run-all/${investigationId}`);
     }
-    const res = await api.post<MultiAgentSuiteResponse>('/ai/agents/run-all');
-    return res.data;
+    return cachedPost<MultiAgentSuiteResponse>('/ai/agents/run-all');
   }
 };
 

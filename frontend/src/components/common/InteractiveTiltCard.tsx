@@ -12,8 +12,8 @@ interface InteractiveTiltCardProps {
 export const InteractiveTiltCard: React.FC<InteractiveTiltCardProps> = ({
   children,
   className = '',
-  glowColor = 'rgba(59, 130, 246, 0.12)',
-  tiltAmount = 8,
+  glowColor = 'rgba(203, 213, 225, 0.18)',
+  tiltAmount = 5,
   onClick
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -59,24 +59,24 @@ export const InteractiveTiltCard: React.FC<InteractiveTiltCardProps> = ({
       style={{
         transformStyle: 'preserve-3d',
         transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) ${
-          isHovered ? 'scale3d(1.025, 1.025, 1.025) translateY(-4px)' : 'scale3d(1, 1, 1)'
+          isHovered ? 'scale3d(1.015, 1.015, 1.015) translateY(-2px)' : 'scale3d(1, 1, 1)'
         }`
       }}
-      className={`relative overflow-hidden transition-all duration-200 ease-out cursor-pointer ${className}`}
+      className={`relative overflow-hidden bg-white/80 backdrop-blur-md border border-slate-200/80 rounded-xl shadow-xs transition-all duration-200 ease-out ${className}`}
     >
-      {/* Interactive dynamic cursor glare reflection */}
+      {/* Subtle non-vibrant monochrome light reflection */}
       {isHovered && (
         <div
           className="pointer-events-none absolute inset-0 z-20 rounded-[inherit] transition-opacity duration-300"
           style={{
-            background: `radial-gradient(circle 320px at ${glarePosition.x}px ${glarePosition.y}px, ${glowColor}, transparent 75%)`
+            background: `radial-gradient(circle 280px at ${glarePosition.x}px ${glarePosition.y}px, ${glowColor}, transparent 80%)`
           }}
         />
       )}
 
-      {/* Shimmer light border reflection */}
+      {/* Subtle border highlight */}
       {isHovered && (
-        <div className="pointer-events-none absolute inset-0 z-10 rounded-[inherit] border border-blue-400/40 shadow-inner" />
+        <div className="pointer-events-none absolute inset-0 z-10 rounded-[inherit] border border-slate-300/80 shadow-xs" />
       )}
 
       {children}

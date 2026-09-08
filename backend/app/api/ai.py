@@ -20,7 +20,12 @@ async def investigate_query(
     db: AsyncSession = Depends(get_async_db), 
     current_user: User = Depends(get_current_user)
 ):
-    ev_res = await db.execute(select(Event).where(Event.investigation_id == req.investigation_id))
+    ev_res = await db.execute(
+        select(Event)
+        .where(Event.investigation_id == req.investigation_id)
+        .order_by(Event.risk_score.desc())
+        .limit(2000)
+    )
     events = ev_res.scalars().all()
 
     inc_res = await db.execute(select(Incident).where(Incident.investigation_id == req.investigation_id))
@@ -36,13 +41,19 @@ async def investigate_query(
     )
 
 
+@router.get("/summary/{investigation_id}", response_model=AISummaryResponse)
 @router.post("/summary/{investigation_id}", response_model=AISummaryResponse)
 async def get_ai_summary(
     investigation_id: str, 
     db: AsyncSession = Depends(get_async_db), 
     current_user: User = Depends(get_current_user)
 ):
-    ev_res = await db.execute(select(Event).where(Event.investigation_id == investigation_id))
+    ev_res = await db.execute(
+        select(Event)
+        .where(Event.investigation_id == investigation_id)
+        .order_by(Event.risk_score.desc())
+        .limit(2000)
+    )
     events = ev_res.scalars().all()
 
     inc_res = await db.execute(select(Incident).where(Incident.investigation_id == investigation_id))
@@ -59,6 +70,7 @@ class RunMultiAgentRequest(BaseModel):
     investigation_id: Optional[str] = None
 
 
+@router.get("/agents/run-all")
 @router.post("/agents/run-all")
 async def run_multi_agent_suite_all(
     req: Optional[RunMultiAgentRequest] = None,
@@ -71,12 +83,17 @@ async def run_multi_agent_suite_all(
 
     try:
         if inv_id:
-            ev_res = await db.execute(select(Event).where(Event.investigation_id == inv_id))
+            ev_res = await db.execute(
+                select(Event)
+                .where(Event.investigation_id == inv_id)
+                .order_by(Event.risk_score.desc())
+                .limit(2000)
+            )
             events = ev_res.scalars().all()
             inc_res = await db.execute(select(Incident).where(Incident.investigation_id == inv_id))
             incident = inc_res.scalars().first()
         else:
-            ev_res = await db.execute(select(Event).limit(100))
+            ev_res = await db.execute(select(Event).order_by(Event.risk_score.desc()).limit(200))
             events = ev_res.scalars().all()
             inc_res = await db.execute(select(Incident).limit(1))
             incident = inc_res.scalars().first()
@@ -88,6 +105,7 @@ async def run_multi_agent_suite_all(
     return suite_results
 
 
+@router.get("/agents/run-all/{investigation_id}")
 @router.post("/agents/run-all/{investigation_id}")
 async def run_multi_agent_suite_by_id(
     investigation_id: str,
@@ -97,7 +115,12 @@ async def run_multi_agent_suite_by_id(
     events = []
     incident = None
     try:
-        ev_res = await db.execute(select(Event).where(Event.investigation_id == investigation_id))
+        ev_res = await db.execute(
+            select(Event)
+            .where(Event.investigation_id == investigation_id)
+            .order_by(Event.risk_score.desc())
+            .limit(2000)
+        )
         events = ev_res.scalars().all()
 
         inc_res = await db.execute(select(Incident).where(Incident.investigation_id == investigation_id))

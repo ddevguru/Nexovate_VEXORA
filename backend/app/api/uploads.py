@@ -64,8 +64,14 @@ async def upload_evidence(
         for rec in raw_records:
             norm_dict = EventNormalizerService.normalize_record(rec, inv.id, ev_file.id)
             e_obj = Event(**norm_dict)
-            db.add(e_obj)
             event_objs.append(e_obj)
+
+        # Batch insert in chunks of 2000 to prevent memory blowup and SQL slowdowns
+        BATCH_SIZE = 2000
+        for i in range(0, len(event_objs), BATCH_SIZE):
+            chunk = event_objs[i:i + BATCH_SIZE]
+            db.add_all(chunk)
+            await db.commit()
 
         ev_file.processing_status = "COMPLETED"
         ev_file.event_count = len(event_objs)

@@ -70,6 +70,9 @@ class RiskEngineService:
                 risk_addition += 10
                 failed_logins_window.append((ts, event.id, usr, ip))
                 
+                # Prune sliding window to keep only events within last 10 minutes (600s)
+                failed_logins_window = [f for f in failed_logins_window if (ts - f[0]).total_seconds() <= 600]
+                
                 # Check for > 5 failed logins within 5 minutes
                 recent_fails = [f for f in failed_logins_window if (ts - f[0]).total_seconds() <= 300 and (f[2] == usr or f[3] == ip)]
                 if len(recent_fails) >= 5:
@@ -83,6 +86,9 @@ class RiskEngineService:
                         "risk_score_impact": 25
                     })
             elif event_type == "AUTHENTICATION" and status == "SUCCESS":
+                # Prune sliding window to keep only events within last 10 minutes (600s)
+                failed_logins_window = [f for f in failed_logins_window if (ts - f[0]).total_seconds() <= 600]
+                
                 # Check if preceded by multiple failed logins
                 recent_fails = [f for f in failed_logins_window if (ts - f[0]).total_seconds() <= 600 and (f[2] == usr or f[3] == ip)]
                 if len(recent_fails) >= 3:

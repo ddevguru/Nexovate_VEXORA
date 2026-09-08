@@ -246,7 +246,7 @@ export const AgentsConsolePage: React.FC<AgentsConsolePageProps> = ({ investigat
   }, [selectedInvId]);
 
   const runSwarmAnalysis = async () => {
-    setLoading(true);
+    if (!suiteData) setLoading(true);
     stopSpeaking();
     try {
       const res = await multiAgentAPI.runAll(selectedInvId || undefined);

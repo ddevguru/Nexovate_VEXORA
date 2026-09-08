@@ -46,7 +46,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="h-16 bg-white border-b border-slate-200 px-4 md:px-6 flex items-center justify-between sticky top-0 z-40 shadow-xs">
+    <header className="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200/80 px-4 md:px-6 flex items-center justify-between sticky top-0 z-40 shadow-2xs">
       {/* Left: Mobile Menu Toggle & Case Selector */}
       <div className="flex items-center gap-3">
         <button
@@ -65,7 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
               const selected = investigations.find((i) => i.id === e.target.value);
               if (selected) onSelectInvestigation(selected);
             }}
-            className="bg-slate-50 border border-slate-300 text-slate-800 text-xs rounded-lg px-2.5 py-1 font-medium focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 max-w-[200px] sm:max-w-[280px] truncate"
+            className="bg-slate-50 border border-slate-300 text-slate-900 text-xs rounded-lg px-2.5 py-1 font-semibold focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800 max-w-[200px] sm:max-w-[280px] truncate cursor-pointer shadow-2xs"
           >
             {investigations.length === 0 ? (
               <option value="">No cases created yet</option>
@@ -88,7 +88,7 @@ export const Header: React.FC<HeaderProps> = ({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search investigation logs (e.g. Rahul, critical, 192.168.1.1)..."
-          className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-4 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all"
+          className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-4 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-800 focus:ring-1 focus:ring-slate-800 transition-all font-medium"
         />
       </form>
 
@@ -98,14 +98,14 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center gap-3 border-l border-slate-200 pl-3 md:pl-4">
             <div className="text-right hidden sm:block">
               <p className="text-xs font-semibold text-slate-900">{user.name}</p>
-              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 font-semibold border border-blue-200">
+              <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">
                 {user.role}
               </span>
             </div>
             <button
               onClick={logout}
               title="Logout"
-              className="p-2 rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 border border-transparent transition-colors"
+              className="p-2 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-transparent transition-colors cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
             </button>
