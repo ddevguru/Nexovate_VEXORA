@@ -1,0 +1,83 @@
+[
+  {
+    "timestamp": "2026-05-10T09:41:00Z",
+    "user": "rahul",
+    "source_ip": "192.168.1.50",
+    "action": "LOGIN_FAILED",
+    "resource": "/ssh",
+    "status": "FAILURE",
+    "message": "Failed password for rahul from 192.168.1.50"
+  },
+  {
+    "timestamp": "2026-05-10T09:42:00Z",
+    "user": "rahul",
+    "source_ip": "192.168.1.50",
+    "action": "LOGIN_FAILED",
+    "resource": "/ssh",
+    "status": "FAILURE",
+    "message": "Failed password for rahul from 192.168.1.50"
+  },
+  {
+    "timestamp": "2026-05-10T09:43:00Z",
+    "user": "rahul",
+    "source_ip": "192.168.1.50",
+    "action": "LOGIN_FAILED",
+    "resource": "/ssh",
+    "status": "FAILURE",
+    "message": "Failed password for rahul from 192.168.1.50"
+  },
+  {
+    "timestamp": "2026-05-10T09:44:00Z",
+    "user": "rahul",
+    "source_ip": "192.168.1.50",
+    "action": "LOGIN_FAILED",
+    "resource": "/ssh",
+    "status": "FAILURE",
+    "message": "Failed password for rahul from 192.168.1.50"
+  },
+  {
+    "timestamp": "2026-05-10T09:45:00Z",
+    "user": "rahul",
+    "source_ip": "192.168.1.50",
+    "action": "LOGIN_SUCCESS",
+    "resource": "/ssh",
+    "status": "SUCCESS",
+    "message": "Accepted password for rahul from 192.168.1.50"
+  },
+  {
+    "timestamp": "2026-05-10T09:47:00Z",
+    "user": "rahul",
+    "source_ip": "10.0.4.102",
+    "action": "SESSION_OPENED",
+    "resource": "SERVER-01",
+    "status": "SUCCESS",
+    "message": "New source IP connection 10.0.4.102"
+  },
+  {
+    "timestamp": "2026-05-10T09:49:00Z",
+    "user": "rahul",
+    "source_ip": "10.0.4.102",
+    "action": "PRIVILEGE_ELEVATION",
+    "resource": "/usr/bin/sudo",
+    "status": "SUCCESS",
+    "message": "rahul elevated to root via sudo"
+  },
+  {
+    "timestamp": "2026-05-10T09:52:00Z",
+    "user": "rahul",
+    "source_ip": "10.0.4.102",
+    "action": "DATABASE_QUERY",
+    "resource": "customer_vault",
+    "status": "SUCCESS",
+    "message": "SELECT * FROM customer_vault"
+  },
+  {
+    "timestamp": "2026-05-10T09:56:00Z",
+    "user": "rahul",
+    "source_ip": "10.0.4.102",
+    "action": "DATA_TRANSFER",
+    "resource": "exfil.external-server.net",
+    "status": "SUCCESS",
+    "message": "Outbound SCP transfer 1.4GB"
+  }
+]

@@ -1,0 +1,11 @@
+timestamp,user,source_ip,action,resource,status,message
+2026-05-10T09:41:00Z,rahul,192.168.1.50,LOGIN_FAILED,/ssh,FAILURE,Failed password for invalid user rahul from 192.168.1.50 port 54321
+2026-05-10T09:42:05Z,rahul,192.168.1.50,LOGIN_FAILED,/ssh,FAILURE,Failed password for rahul from 192.168.1.50 port 54322
+2026-05-10T09:43:10Z,rahul,192.168.1.50,LOGIN_FAILED,/ssh,FAILURE,Failed password for rahul from 192.168.1.50 port 54323
+2026-05-10T09:44:15Z,rahul,192.168.1.50,LOGIN_FAILED,/ssh,FAILURE,Failed password for rahul from 192.168.1.50 port 54324
+2026-05-10T09:45:00Z,rahul,192.168.1.50,LOGIN_SUCCESS,/ssh,SUCCESS,Accepted password for rahul from 192.168.1.50 port 54325 ssh2
+2026-05-10T09:47:30Z,rahul,10.0.4.102,SESSION_OPENED,SERVER-01,SUCCESS,New source IP connection established from 10.0.4.102
+2026-05-10T09:49:12Z,rahul,10.0.4.102,PRIVILEGE_ELEVATION,/usr/bin/sudo,SUCCESS,rahul : TTY=pts/1 ; PWD=/home/rahul ; USER=root ; COMMAND=/bin/bash
+2026-05-10T09:52:45Z,rahul,10.0.4.102,DATABASE_QUERY,PostgreSQL: customer_vault,SUCCESS,SELECT * FROM customer_vault WHERE credit_card IS NOT NULL
+2026-05-10T09:56:20Z,rahul,10.0.4.102,DATA_TRANSFER,scp://exfil.external-server.net/dump.tar.gz,SUCCESS,Transferred 1.4 GB to exfil.external-server.net
+2026-05-10T10:01:00Z,rahul,10.0.4.102,SESSION_TERMINATED,SERVER-01,SUCCESS,Session closed for user rahul

@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: cybertrace-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: cybertrace
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: cybertracepass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: cybertrace-backend
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://postgres:cybertracepass@postgres:5432/cybertrace
+      JWT_SECRET: cybertrace-hackathon-production-secret-2026
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      AI_PROVIDER: gemini
+      MAX_UPLOAD_SIZE_MB: 50
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: cybertrace-frontend
+    restart: always
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
